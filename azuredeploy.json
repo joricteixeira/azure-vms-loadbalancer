@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "storageAccountName": {
-        "type": "string",
-        "metadata": {
-          "description": "Name of storage account"
-        }
-      },
       "adminUsername": {
         "type": "string",
         "metadata": {
@@ -18,12 +12,6 @@
         "type": "securestring",
         "metadata": {
           "description": "Admin password"
-        }
-      },
-      "dnsNameforLBIP": {
-        "type": "string",
-        "metadata": {
-          "description": "DNS for Load Balancer IP"
         }
       },
       "vmNamePrefix": {
@@ -40,13 +28,6 @@
           "description": "Load Balancer name"
         }
       },
-      "nicNamePrefix": {
-        "type": "string",
-        "defaultValue": "nic",
-        "metadata": {
-          "description": "Network Interface name prefix"
-        }
-      },      
       "vmSize": {
         "type": "string",
         "defaultValue": "Standard_DS1_v2",
@@ -60,6 +41,8 @@
       "vnetName": "xpto-vnet",
       "appSubnetName": "app-sbn",
       "availabilitySetName": "app-avset",
+      "storageAccountName":"[concat('stgacc', uniqueString(resourceGroup().id))]",
+      "nicNamePrefix":"[concat(parameters('vmNamePrefix'),'-nic-')]",
 
       "numberOfInstances": 2,
       "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('lbName'))]",
@@ -72,7 +55,7 @@
     "resources": [
       {
         "type": "Microsoft.Storage/storageAccounts",
-        "name": "[parameters('storageAccountName')]",
+        "name": "[variables('storageAccountName')]",
         "apiVersion": "2015-05-01-preview",
         "location": "[resourceGroup().location]",
         "properties": {
@@ -96,10 +79,7 @@
         "name": "[variables('publicIPAddressName')]",
         "location": "[resourceGroup().location]",
         "properties": {
-          "publicIPAllocationMethod": "Dynamic",
-          "dnsSettings": {
-            "domainNameLabel": "[parameters('dnsNameforLBIP')]"
-          }
+          "publicIPAllocationMethod": "Dynamic"
         }
       },
       {
@@ -126,7 +106,7 @@
       {
         "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
-        "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
+        "name": "[concat(variables('nicNamePrefix'), copyindex())]",
         "location": "[resourceGroup().location]",
         "copy": {
           "name": "nicLoop",
@@ -254,8 +234,8 @@
         },
         "location": "[resourceGroup().location]",
         "dependsOn": [
-          "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-          "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]",
+          "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicNamePrefix'), copyindex())]",
           "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
         ],
         "properties": {
@@ -284,14 +264,14 @@
           "networkProfile": {
             "networkInterfaces": [
               {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicNamePrefix'),copyindex()))]"
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicNamePrefix'),copyindex()))]"
               }
             ]
           },
           "diagnosticsProfile": {
             "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net')]"
+              "storageUri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net')]"
             }
           }
         }
