@@ -12,12 +12,15 @@ param(
 $password = ConvertTo-SecureString "$($AccountPassword)" -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential($AccountName, $password)
 
+$overrideParameters = @{}
+$overrideParameters.Add("chefServerUrl",$ChefServerUrl)
+$overrideParameters.Add("chefValidationClientName",$ChefValidationClientName)
+$overrideParameters.Add("chefValidationKey",$ChefValidationKey)
+
 Login-AzureRmAccount -Credential $credential
 
 New-AzureRmResourceGroupDeployment `
     -ResourceGroupName $ResourceGroupName `
     -TemplateFile .\azuredeploy.json `
     -TemplateParameterFile .\azuredeploy.parameters.json `
-    -chefServerUrl $ChefServerUrl `
-    -chefValidationClientName $ChefValidationClientName `
-    -chefValidationKey $ChefValidationKey
+    -TemplateParameterObject $overrideParameters
