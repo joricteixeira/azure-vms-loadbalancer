@@ -1,4 +1,4 @@
-params(
+param(
     [string]$AccountName,
     [string]$AccountPassword,
     [string]$ResourceGroupName,
