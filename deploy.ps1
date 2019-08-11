@@ -12,7 +12,7 @@ param(
 $password = ConvertTo-SecureString "$($AccountPassword)" -AsPlainText -Force
 $credential = New-Object System.Management.Automation.PSCredential($AccountName, $password)
 
-Login-AzAccount -Credential $credential
+Login-AzureRmAccount -Credential $credential
 
 New-AzureRmResourceGroupDeployment `
     -ResourceGroupName $ResourceGroupName `
