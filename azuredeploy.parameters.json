@@ -7,6 +7,15 @@
       },
       "adminPassword": {
         "value": "Admin123_!"
+      },
+      "chefServerUrl":{
+        "value": null
+      },
+      "chefValidationClientName":{
+        "value": null
+      },
+      "chefValidationKey":{
+        "value": null
       }  
     }
   }
