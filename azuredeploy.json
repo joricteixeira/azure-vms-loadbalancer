@@ -34,7 +34,16 @@
         "metadata": {
           "description": "Size of the VM"
         }
-      }
+      },
+      "chefServerUrl":{
+        "type": "string"
+      },
+      "chefValidationClientName":{
+        "type": "string"
+      },
+      "chefValidationKey":{
+        "type": "securestring"
+      }      
     },
     "variables": {
       "publicIPAddressName": "lb-public-ip",
@@ -275,6 +284,51 @@
             }
           }
         }
-      }
+      },
+
+
+
+
+
+
+
+
+
+
+      {
+        "name": "[concat(parameters('vmNamePrefix'), copyindex(),'/WindowsChefExtension')]",
+        "type":"Microsoft.Compute/virtualMachines/extensions",
+        "location":"[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachines/',parameters('vmNamePrefix'), copyindex())]"
+        ],
+        "apiVersion":"2015-06-15",
+        "copy": {
+          "name": "chef-virtualMachineLoop",
+          "count": "[variables('numberOfInstances')]"
+        },
+        "properties":{
+            "publisher":"Chef.Bootstrap.WindowsAzure",
+            "type":"ChefClient",
+            "typeHandlerVersion":"1210.12",
+            "autoUpgradeMinorVersion": false,
+            "settings":{
+                "bootstrap_options":{
+                    "chef_node_name":"[concat(parameters('vmNamePrefix'), copyindex())]",
+                    "chef_server_url":"[parameters('chefServerUrl')]",
+                    "validation_client_name":"[parameters('chefValidationClientName')]",
+                    "node_ssl_verify_mode":"peer",
+                    "environment":"_default",
+                    "secret":""
+                },
+                "runlist":"role[web]",
+                "client_rb":""
+            },
+            "protectedSettings":{
+                "validation_key":"[parameters('chefValidationKey')]",
+                "chef_server_crt":""
+            }
+        }
+    }
     ]
   }
