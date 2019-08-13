@@ -312,7 +312,7 @@
             "type":"ChefClient",
             "typeHandlerVersion":"1210.12",
             "autoUpgradeMinorVersion": false,
-            "settings":{
+            "settings":{                
                 "bootstrap_options":{
                     "chef_node_name":"[concat(parameters('vmNamePrefix'), copyindex())]",
                     "chef_server_url":"[parameters('chefServerUrl')]",
@@ -322,7 +322,8 @@
                     "secret":""
                 },
                 "runlist":"role[web]",
-                "client_rb":""
+                "client_rb":"",
+                "validation_key_format": "base64encoded"
             },
             "protectedSettings":{
                 "validation_key":"[parameters('chefValidationKey')]",
